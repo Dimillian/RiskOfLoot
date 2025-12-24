@@ -25,8 +25,8 @@ export class RenderSystem extends System {
   ];
 
   private getViewportSize(): { width: number; height: number } {
-    const width = this.canvas.clientWidth || this.canvas.width;
-    const height = this.canvas.clientHeight || this.canvas.height;
+    const width = this.canvas.clientWidth || window.innerWidth;
+    const height = this.canvas.clientHeight || window.innerHeight;
     return { width, height };
   }
 
