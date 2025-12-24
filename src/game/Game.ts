@@ -6,6 +6,7 @@ import {
   RENDERABLE_COMPONENT,
   type Renderable
 } from '../components/Renderable.js';
+import { STATS_COMPONENT, type Stats } from '../components/Stats.js';
 import { InputSystem } from '../systems/InputSystem.js';
 import { MovementSystem } from '../systems/MovementSystem.js';
 import { RenderSystem } from '../systems/RenderSystem.js';
@@ -39,6 +40,13 @@ export class Game {
     componentRegistry.set<Renderable>(this.playerEntity, RENDERABLE_COMPONENT, {
       color: '#00ff00',
       radius: 20
+    });
+    componentRegistry.set<Stats>(this.playerEntity, STATS_COMPONENT, {
+      healthCurrent: 100,
+      healthMax: 100,
+      xpCurrent: 0,
+      xpToNext: 100,
+      level: 1
     });
 
     // Add systems
