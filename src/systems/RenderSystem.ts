@@ -89,6 +89,8 @@ export class RenderSystem extends System {
     // Get camera offset (centered on player)
     const cameraOffset = this.getCameraOffset();
 
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
     // Draw forest-like grid background
     this.drawGrid(cameraOffset);
 
