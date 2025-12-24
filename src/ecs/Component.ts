@@ -33,4 +33,11 @@ export class ComponentRegistry {
     const componentMap = this.components.get(componentType);
     return componentMap ? Array.from(componentMap.keys()) : [];
   }
+
+  removeEntity(entity: Entity): void {
+    // Remove entity from all component maps
+    for (const componentMap of this.components.values()) {
+      componentMap.delete(entity);
+    }
+  }
 }

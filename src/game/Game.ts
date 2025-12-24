@@ -7,9 +7,15 @@ import {
   type Renderable
 } from '../components/Renderable.js';
 import { STATS_COMPONENT, type Stats } from '../components/Stats.js';
+import { WEAPON_COMPONENT, type Weapon } from '../components/Weapon.js';
 import { InputSystem } from '../systems/InputSystem.js';
 import { MovementSystem } from '../systems/MovementSystem.js';
 import { RenderSystem } from '../systems/RenderSystem.js';
+import { MonsterSpawnSystem } from '../systems/MonsterSpawnSystem.js';
+import { MonsterAISystem } from '../systems/MonsterAISystem.js';
+import { AttackSystem } from '../systems/AttackSystem.js';
+import { CombatSystem } from '../systems/CombatSystem.js';
+import { LevelUpSystem } from '../systems/LevelUpSystem.js';
 
 export class Game {
   private world: World;
@@ -48,13 +54,36 @@ export class Game {
       xpToNext: 100,
       level: 1
     });
+    componentRegistry.set<Weapon>(this.playerEntity, WEAPON_COMPONENT, {
+      damage: 25,
+      attackCooldown: 1.0,
+      cooldownRemaining: 0,
+      range: 50
+    });
 
-    // Add systems
+    // Add systems in order: Input → Spawn → AI → Movement → Attack → Combat → LevelUp → Render
     this.world.addSystem(
       new InputSystem(componentRegistry, this.playerEntity)
     );
+    this.world.addSystem(
+      new MonsterSpawnSystem(componentRegistry, this.world, this.playerEntity)
+    );
+    this.world.addSystem(
+      new MonsterAISystem(componentRegistry, this.playerEntity)
+    );
     this.world.addSystem(new MovementSystem(componentRegistry));
-    this.world.addSystem(new RenderSystem(componentRegistry, canvas, this.playerEntity));
+    this.world.addSystem(
+      new AttackSystem(componentRegistry, this.playerEntity)
+    );
+    this.world.addSystem(
+      new CombatSystem(componentRegistry, this.world, this.playerEntity)
+    );
+    this.world.addSystem(
+      new LevelUpSystem(componentRegistry, this.playerEntity)
+    );
+    this.world.addSystem(
+      new RenderSystem(componentRegistry, canvas, this.playerEntity)
+    );
 
     // Refocus canvas on click to ensure keyboard input works
     canvas.addEventListener('click', () => {

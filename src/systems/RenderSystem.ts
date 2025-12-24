@@ -7,6 +7,8 @@ import {
   type Renderable
 } from '../components/Renderable.js';
 import { STATS_COMPONENT, type Stats } from '../components/Stats.js';
+import { MONSTER_COMPONENT } from '../components/Monster.js';
+import { HEALTH_COMPONENT, type Health } from '../components/Health.js';
 
 export class RenderSystem extends System {
   private canvas: HTMLCanvasElement;
@@ -145,6 +147,28 @@ export class RenderSystem extends System {
     this.ctx.restore();
   }
 
+  private drawHealthBar(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    fillRatio: number
+  ): void {
+    const clampedRatio = Math.max(0, Math.min(1, fillRatio));
+
+    this.ctx.save();
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    this.ctx.fillRect(x, y, width, height);
+
+    this.ctx.fillStyle = '#e84545';
+    this.ctx.fillRect(x + 1, y + 1, (width - 2) * clampedRatio, height - 2);
+
+    this.ctx.strokeStyle = '#ffffff';
+    this.ctx.lineWidth = 1;
+    this.ctx.strokeRect(x, y, width, height);
+    this.ctx.restore();
+  }
+
   private drawHud(): void {
     const stats = this.componentRegistry.get<Stats>(
       this.playerEntity,
@@ -225,6 +249,30 @@ export class RenderSystem extends System {
       this.ctx.arc(screenX, screenY, renderable.radius, 0, Math.PI * 2);
       this.ctx.fillStyle = renderable.color;
       this.ctx.fill();
+
+      // Draw health bar for monsters if health is not full
+      const isMonster = this.componentRegistry.has(entity, MONSTER_COMPONENT);
+      if (isMonster) {
+        const health = this.componentRegistry.get<Health>(
+          entity,
+          HEALTH_COMPONENT
+        );
+
+        if (health && health.current < health.max) {
+          const barWidth = renderable.radius * 2;
+          const barHeight = 4;
+          const barX = screenX - barWidth / 2;
+          const barY = screenY - renderable.radius - barHeight - 4;
+
+          this.drawHealthBar(
+            barX,
+            barY,
+            barWidth,
+            barHeight,
+            health.current / health.max
+          );
+        }
+      }
     }
 
     this.drawTimer();

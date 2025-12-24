@@ -28,4 +28,8 @@ export class World {
       system.update(deltaTime);
     }
   }
+
+  destroyEntity(entity: Entity): void {
+    this.componentRegistry.removeEntity(entity);
+  }
 }
